@@ -28,6 +28,7 @@ st.write("La sélection présentée ici répond aux critères suivants : Retrait
 
 #Chargement du DataFrame étudié :
 df = pd.read_csv('final0.csv')
+df.drop(df.loc[df["genres"].str.contains('Adult')].index, inplace=True)
 
 col1_df, col2_df = st.columns(2)
 
