@@ -83,6 +83,6 @@ with graph1 :
 with graph2 :
   sns.boxplot(x=select['numVotes']).figure ; plt.close()
 with graph3 :
-  sns.scatterplot(x = select['averageRating'], y = select['numVotes'], hue = select['startYear']).figure ; plt.close()
+  sns.scatterplot(x = select['averageRating'], y = select['numVotes'], hue = select['genres']).figure ; plt.close()
 with graph4 :
   sns.histplot(select['averageRating'], bins=10).figure ; plt.close()
