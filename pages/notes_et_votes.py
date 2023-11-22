@@ -29,6 +29,10 @@ st.write("La sélection présentée ici répond aux critères suivants : Retrait
 #Chargement du DataFrame étudié :
 df = pd.read_csv('final0.csv')
 df.drop(df.loc[df["genres"].str.contains('Adult')].index, inplace=True)
+#df['genres'] = df['genres'].map({"\N" : 'Non renseigné'})
+df['decennie'] = df['startYear'].apply(lambda x : x[0:3])
+df['decennie'] = df['decennie'].apply(lambda x : str(x)+'0')
+df
 
 col1_df, col2_df = st.columns(2)
 
@@ -76,13 +80,13 @@ select[['title', 'genres', 'startYear', 'averageRating', 'numVotes']]
 
 st.title('Statistiques visuelles pour votre sélection :')
 
-graph1, graph2, graph3, graph4 = st.columns(4)
+graph1, graph2 = st.columns(2)
 
 with graph1 :
   sns.boxplot(x=select['averageRating']).figure ; plt.close()
+  'Notes en fonction du nombre de votes :'
+  sns.scatterplot(x = select['averageRating'], y = select['numVotes'], hue = select['decennie']).figure ; plt.close()
 with graph2 :
-  sns.boxplot(x=select['numVotes']).figure ; plt.close()
-with graph3 :
-  sns.scatterplot(x = select['averageRating'], y = select['numVotes']).figure ; plt.close()
-with graph4 :
-  sns.histplot(select['averageRating'], bins=10).figure ; plt.close()
+  sns.scatterplot(x=select['decennie'], y=select['numVotes'], hue = select['decennie']).figure ; plt.close()
+  'Répartition par décennie :'
+  sns.histplot(select['decennie'].sort_values()).figure ; plt.close()
