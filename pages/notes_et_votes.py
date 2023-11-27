@@ -32,13 +32,15 @@ df.drop(df.loc[df["genres"].str.contains('Adult')].index, inplace=True)
 #df['genres'] = df['genres'].map({"\N" : 'Non renseigné'})
 df['decennie'] = df['startYear'].apply(lambda x : x[0:3])
 df['decennie'] = df['decennie'].apply(lambda x : str(x)+'0')
-df
+#df[['title', 'startYear', 'runtimeMinutes', 'genres', 'averageRating', 'numVotes', 'primaryName', 'category', 'job', 'characters', 'primaryTitle', 'originalTitle', 'decennie']]
+isna_ = pd.DataFrame(df['averageRating'].isna().value_counts())
 
 col1_df, col2_df = st.columns(2)
 
 with col1_df :
   f"Voici un échantillon aléatoire de 5 films parmi la sélection initiale, qui contient {df['tconst'].nunique()} films :"
   df_sample = df[['title', 'genres', 'startYear']].sample(5)
+  df_sample.set_axis(['Titre', 'Genres', 'Année'], axis = 1, inplace = True)
   df_sample
 
 with col2_df :
@@ -47,9 +49,14 @@ with col2_df :
   df_stats.drop(['count', 'std'], axis = 0, inplace = True)
   df_stats['averageRating'] = df_stats['averageRating'].round(2)
   df_stats['numVotes'] = df_stats['numVotes'].astype('int')
+  df_stats.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1, inplace = True)
   df_stats
 
-"Nous vous proposons d'effectuer un ajustement par la note et le nombre de votes, et visualiser l'impact de vos choix :"
+f"Précision : parmi ces films, {isna_['averageRating'][1]} n'ont pas de note. Ils seront donc ignorés dans l'analyse qui suit."
+
+st.title('Ajustement de la selection')
+
+"Nous vous proposons d'effectuer un ajustement par la note, le nombre de votes et éventuellement le genre, et visualiser l'impact de vos choix :"
 
 col_notes, col_votes, col_genre = st.columns(3)
 
@@ -63,30 +70,67 @@ with col_genre :
   expdgenres = df['genres'].str.split(',')
   expdgenres = expdgenres.explode('genres')
   expdgenres = expdgenres.value_counts()
-  expdgenres = pd.DataFrame(expdgenres).reset_index()
+  expdgenres = pd.DataFrame(expdgenres).reset_index().sort_values('index')
   genres = expdgenres['index'].unique()
-  genres = list(genres) + ['(tous)']
+  genres = ['(tous)'] + list(genres)
   genre = st.selectbox("Genre :", genres)
 
 if genre != "(tous)" :
   select = df[(df['averageRating'] >= note) & (df['numVotes'] >= votes) & (df['genres'].str.contains(genre))]
 if genre == "(tous)" :
   select = df[(df['averageRating'] >= note) & (df['numVotes'] >= votes)]
-st.write(len(select))
-
-f"Les critères sélectionnés réduisent votre sélection à ces {select['tconst'].nunique()} films :"
-
-select[['title', 'genres', 'startYear', 'averageRating', 'numVotes']]
 
 st.title('Statistiques visuelles pour votre sélection :')
 
+f"Les critères sélectionnés réduisent votre sélection à {select['tconst'].nunique()} films (liste sous les graphiques) :"
+
 graph1, graph2 = st.columns(2)
+graph3, graph4 = st.columns(2)
 
 with graph1 :
-  sns.boxplot(x=select['averageRating']).figure ; plt.close()
-  'Notes en fonction du nombre de votes :'
-  sns.scatterplot(x = select['averageRating'], y = select['numVotes'], hue = select['decennie']).figure ; plt.close()
+  A = sns.boxplot(x=select['averageRating'])
+  plt.title('Distribution en fonction de la note')
+  plt.xlabel('Note moyenne')
+  A.set_xticks(range(0, 11, 1))
+  st.pyplot(A.figure) ; plt.close()
+
 with graph2 :
-  sns.scatterplot(x=select['decennie'], y=select['numVotes'], hue = select['decennie']).figure ; plt.close()
-  'Répartition par décennie :'
-  sns.histplot(select['decennie'].sort_values()).figure ; plt.close()
+  B = sns.barplot(x=select['decennie'].sort_values(), y=select['numVotes'], hue = select['decennie'])
+  plt.title('Nombre de votes par décennie')
+  plt.xlabel("")
+  st.pyplot(B.figure) ; plt.close()
+
+with graph3 :
+
+  C = sns.scatterplot(x = select['averageRating'], y = select['numVotes'], hue = select['decennie'])
+  plt.title('Nombre de votes en fonction de la note')
+  plt.xlabel('Note moyenne')
+  plt.ylabel('Nb de votes')
+  C.set_xticks(range(0, 11, 1))
+  st.pyplot(C.figure) ; plt.close()
+
+with graph4 :
+  D = sns.histplot(select['decennie'].sort_values())
+  plt.title('Répartition par décennie')
+  plt.xlabel("")
+  plt.ylabel("Nombre de films")
+  st.pyplot(D.figure) ; plt.close()
+
+c1, c2 = st.columns([0.7, 0.3])
+
+with c1 :
+
+  f"Détail des films de votre sélection : ({select['tconst'].nunique()})"
+
+  display = select[['title', 'genres', 'startYear', 'averageRating', 'numVotes']].set_axis(['Titre', 'Genres', 'Année', 'Note moyenne', 'Nombre de votes'], axis = 1)
+  display
+
+with c2 :
+
+  st.write("Quelques statistiques sommaires :")
+  stat = select[['numVotes', 'averageRating']].describe()
+  stat.drop(['count', 'std'], axis = 0, inplace = True)
+  stat['averageRating'] = stat['averageRating'].round(2)
+  stat['numVotes'] = stat['numVotes'].astype('int')
+  stat.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1, inplace = True)
+  stat
