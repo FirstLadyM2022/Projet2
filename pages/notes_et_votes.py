@@ -35,7 +35,7 @@ df['decennie'] = df['decennie'].apply(lambda x : str(x)+'0')
 #df[['title', 'startYear', 'runtimeMinutes', 'genres', 'averageRating', 'numVotes', 'primaryName', 'category', 'job', 'characters', 'primaryTitle', 'originalTitle', 'decennie']]
 isna_ = pd.DataFrame(df['averageRating'].isna().value_counts())
 
-col1_df, col2_df = st.columns(2)
+col1_df, col2_df = st.columns(0.7, 0.3)
 
 with col1_df :
   f"Voici un échantillon aléatoire de 5 films parmi la sélection initiale, qui contient {df['tconst'].nunique()} films :"
