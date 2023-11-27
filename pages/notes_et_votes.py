@@ -29,6 +29,9 @@ st.write("La sélection présentée ici répond aux critères suivants : Retrait
 #Chargement du DataFrame étudié :
 df = pd.read_csv('final0.csv')
 df.drop(df.loc[df["genres"].str.contains('Adult')].index, inplace=True)
+df.drop(df.loc[df["genres"].str.contains('Game-Show')].index, inplace=True)
+df.drop(df.loc[df["genres"].str.contains('Reality-TV')].index, inplace=True)
+df.drop(df.loc[df["genres"].str.contains('Talk-Show')].index, inplace=True)
 #df['genres'] = df['genres'].map({"\N" : 'Non renseigné'})
 df['decennie'] = df['startYear'].apply(lambda x : x[0:3])
 df['decennie'] = df['decennie'].apply(lambda x : str(x)+'0')
