@@ -12,7 +12,7 @@ with title1 :
   st.title('Projet 2 : Système de recommandation de films')
 with title2 :
   "Olmira, Mireille, Maxime, Julie" 
-  st.image('logo_WCS.png')
+  st.image(r"C:\Users\mirei\Desktop\dossier streamlit\Projet2\logo_WCS.png")
 
 #####
 
@@ -27,7 +27,7 @@ st.write("Après un premier niveau de filtrage, nous vous proposons d'affiner la
 st.write("La sélection présentée ici répond aux critères suivants : Retrait des films pour adultes, année supérieure ou égale à 1980, version du film destinée à la France.")
 
 #Chargement du DataFrame étudié :
-df = pd.read_csv('final0.csv')
+df = pd.read_csv(r"c:\Users\mirei\Desktop\dossier streamlit\Projet2\final0.csv")
 df.drop(df.loc[df["genres"].str.contains('Adult')].index, inplace=True)
 df.drop(df.loc[df["genres"].str.contains('Game-Show')].index, inplace=True)
 df.drop(df.loc[df["genres"].str.contains('Reality-TV')].index, inplace=True)
@@ -51,10 +51,10 @@ with col2_df :
   df_stats.drop(['count', 'std'], axis = 0, inplace = True)
   df_stats['averageRating'] = df_stats['averageRating'].round(2)
   df_stats['numVotes'] = df_stats['numVotes'].astype('int')
-  df_stats.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1, inplace = True)
+  df_stats = df_stats.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1)
   df_stats
 
-f"Précision : parmi ces films, {isna_['averageRating'][1]} n'ont pas de note. Ils seront donc ignorés dans l'analyse qui suit."
+#f"Précision : parmi ces films, {isna_(df['averageRating'][0])} n'ont pas de note. Ils seront donc ignorés dans l'analyse qui suit."
 
 st.title('Ajustement de la selection')
 
@@ -72,8 +72,8 @@ with col_genre :
   expdgenres = df['genres'].str.split(',')
   expdgenres = expdgenres.explode('genres')
   expdgenres = expdgenres.value_counts()
-  expdgenres = pd.DataFrame(expdgenres).reset_index().sort_values('index')
-  genres = expdgenres['index'].unique()
+  expdgenres = pd.DataFrame(expdgenres).reset_index().sort_index()
+  genres = expdgenres.genres.unique()
   genres = ['(tous)'] + list(genres)
   genre = st.selectbox("Genre :", genres)
 
@@ -134,5 +134,5 @@ with c2 :
   stat.drop(['count', 'std'], axis = 0, inplace = True)
   stat['averageRating'] = stat['averageRating'].round(2)
   stat['numVotes'] = stat['numVotes'].astype('int')
-  stat.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1, inplace = True)
+  stat = stat.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1)
   stat
