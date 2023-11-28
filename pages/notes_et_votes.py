@@ -51,7 +51,7 @@ with col2_df :
   df_stats.drop(['count', 'std'], axis = 0, inplace = True)
   df_stats['averageRating'] = df_stats['averageRating'].round(2)
   df_stats['numVotes'] = df_stats['numVotes'].astype('int')
-  df_stats.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1, inplace = True)
+  df_stats = df_stats.set_axis(['Nombre de votes', 'Note moyenne'], axis = 1)
   df_stats
 
 f"Précision : parmi ces films, {isna_['averageRating'][1]} n'ont pas de note. Ils seront donc ignorés dans l'analyse qui suit."
